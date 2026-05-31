@@ -17,7 +17,8 @@ run = [
 
   # Terraform lint
   "tflint --init",
-  "tflint --chdir terraform/website/ -c ../../.tflint.hcl",
+  "tflint --chdir terragrunt/modules/website -c ../../../.tflint.hcl",
+
 
   # HTML linting
   "bundle exec htmlproofer ./_site --check-external-hash"
