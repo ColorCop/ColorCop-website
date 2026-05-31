@@ -9,9 +9,19 @@ terraform {
   # source of truth. Without this flag, `terragrunt init` would create a
   # local lockfile here, causing CI to detect uncommitted changes.
   extra_arguments "disable_lockfile" {
-    commands = ["init"]
+    commands  = ["init"]
     arguments = ["-lockfile=readonly"]
   }
+
+  # Force Terragrunt to always run `init` before `plan` or `apply`,
+  # ensuring the readonly lockfile flag is ALWAYS applied. Without this,
+  # Terragrunt may skip init due to caching, causing OpenTofu to run
+  # without -lockfile=readonly and generate a lockfile in the live folder.
+  before_hook "force_init" {
+    commands = ["plan", "apply"]
+    execute  = ["terragrunt", "init"]
+  }
+
   source = "../../../terraform/website/"
 }
 
