@@ -13,7 +13,6 @@ on:
       branch:
         description: Branch to deploy
         required: true
-        # user must select a branch when triggering workflow manually
 
 env:
   working_dir: terragrunt
@@ -29,8 +28,6 @@ jobs:
     - name: Checkout selected branch
       uses: actions/checkout@v6
       with:
-        # If workflow_dispatch, use the selected branch.
-        # If push event, use the branch that triggered the workflow.
         ref: ${{ github.event.inputs.branch || github.ref_name }}
 
     - name: Configure AWS Credentials
@@ -41,10 +38,6 @@ jobs:
         aws-region: us-east-1
 
     - name: Initialize Terragrunt (backend + providers)
-      # terragrunt init:
-      # - Configures the remote backend (S3 + DynamoDB)
-      # - Downloads provider versions pinned in the lockfile
-      # - Prepares the working directory for plan/apply
       uses: gruntwork-io/terragrunt-action@v3
       env:
         TERRAGRUNT_DISABLE_COPY: true
@@ -60,7 +53,6 @@ jobs:
         tg_dir: ${{ env.working_dir }}
         tg_command: "run-all plan"
 
-
     - name: Terragrunt Apply
       uses: gruntwork-io/terragrunt-action@v3
       env:
@@ -69,12 +61,11 @@ jobs:
         tg_dir: ${{ env.working_dir }}
         tg_command: "run-all apply"
 
+    # TODO(j4y): Replace hard-coded path once multiple stacks exist.
     - name: Read Values
       id: terragrunt_output
       run: |
-        cd terragrunt/live/website
-        printf "distribution_id=%s\n" $(terragrunt output distribution_id) >> "$GITHUB_OUTPUT"
-        printf "bucket_name=%s\n" $(terragrunt output bucket_name) >> "$GITHUB_OUTPUT"
+        ./scripts/read_terragrunt_outputs.sh terragrunt/live/website
 
     - name: Build Jekyll project
       run: |
@@ -93,4 +84,3 @@ jobs:
 
     - name: Invalidate Cloudfront
       run: aws cloudfront create-invalidation --distribution-id ${{ steps.terragrunt_output.outputs.distribution_id }} --paths "/*"
-
