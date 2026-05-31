@@ -13,13 +13,12 @@ terraform {
     arguments = ["-lockfile=readonly"]
   }
 
-  # Force Terragrunt to always run `init` before `plan` or `apply`,
-  # ensuring the readonly lockfile flag is ALWAYS applied. Without this,
-  # Terragrunt may skip init due to caching, causing OpenTofu to run
-  # without -lockfile=readonly and generate a lockfile in the live folder.
+  # Force initialization before plan/apply, but run *terraform init*
+  # instead of terragrunt init. Running terragrunt init inside the
+  # .terragrunt-cache causes include recursion and breaks.
   before_hook "force_init" {
     commands = ["plan", "apply"]
-    execute  = ["terragrunt", "init"]
+    execute  = ["terraform", "init", "-lockfile=readonly"]
   }
 
   source = "../../../terraform/website/"
