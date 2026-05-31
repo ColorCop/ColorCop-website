@@ -89,6 +89,22 @@ jobs:
     - name: Invalidate Cloudfront
       run: aws cloudfront create-invalidation --distribution-id ${{ steps.terragrunt_output.outputs.distribution_id }} --paths "/*"
 
+    - name: Auto-commit updated Terraform lockfile
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+
+        # Only commit the module lockfile — live lockfiles must never exist
+        git add terragrunt/modules/website/.terraform.lock.hcl
+
+        if git diff --cached --quiet; then
+          echo "No lockfile changes to commit."
+        else
+          echo "Committing updated lockfile..."
+          git commit -m "chore(terraform): update provider lock file"
+          git push
+        fi
+
     - name: Check for uncommitted changes
       run: |
         git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -109,6 +125,8 @@ jobs:
         else
           echo "✅ No uncommitted changes after deploy."
         fi
+
+
 
     - name: Upload lock files on failure
       if: failure()
