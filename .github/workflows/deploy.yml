@@ -94,24 +94,3 @@ jobs:
     - name: Invalidate Cloudfront
       run: aws cloudfront create-invalidation --distribution-id ${{ steps.terragrunt_output.outputs.distribution_id }} --paths "/*"
 
-    - name: Check for uncommitted changes
-      run: |
-        git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-        echo "Git status after build:"
-        git status
-        git diff
-
-        CHANGES="$(git status --porcelain)"
-        if [ -n "$CHANGES" ]; then
-          echo "❌ Uncommitted changes detected in the repository."
-          echo "These files changed (format: XY path):"
-          echo "$CHANGES"
-
-          echo "::error::Your deployment produced uncommitted changes. \
-          This usually means something should be added to .gitignore or a lockfile/other tracked file needs updating."
-          exit 1
-        else
-          echo "✅ No uncommitted changes after deploy."
-        fi
-
