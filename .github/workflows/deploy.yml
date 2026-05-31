@@ -72,9 +72,9 @@ jobs:
     - name: Read Values
       id: terragrunt_output
       run: |
-        cd terragrunt
-        printf "distribution_id=%s\n" $(terragrunt output --terragrunt-include-dir live distribution_id) >> "$GITHUB_OUTPUT"
-        printf "bucket_name=%s\n" $(terragrunt output --terragrunt-include-dir live bucket_name) >> "$GITHUB_OUTPUT"
+        cd terragrunt/live/website
+        printf "distribution_id=%s\n" $(terragrunt output distribution_id) >> "$GITHUB_OUTPUT"
+        printf "bucket_name=%s\n" $(terragrunt output bucket_name) >> "$GITHUB_OUTPUT"
 
     - name: Build Jekyll project
       run: |
