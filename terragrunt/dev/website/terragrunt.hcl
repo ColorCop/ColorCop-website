@@ -1,13 +1,17 @@
+
+# TODO(j4y): dev.colorcop.net DNS isn't there and needs some work
+skip = true
+
 include "root" {
-  path = find_in_parent_folders()
+  path = find_in_parent_folders("terragrunt.hcl")
 }
 
 terraform {
-  source = "../../../terraform/website/"
+  source = "../../modules/website"
 }
 
 inputs = {
   env    = "dev"
-  # FIXME: need new strategy for dev/staging domain
   domain = "dev.colorcop.net"
 }
+

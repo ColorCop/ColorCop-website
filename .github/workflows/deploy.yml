@@ -16,7 +16,7 @@ on:
         # user must select a branch when triggering workflow manually
 
 env:
-  working_dir: terragrunt/live/website
+  working_dir: terragrunt
 
 concurrency:
   group: ${{ github.workflow }}
@@ -50,7 +50,7 @@ jobs:
         TERRAGRUNT_DISABLE_COPY: true
       with:
         tg_dir: ${{ env.working_dir }}
-        tg_command: init
+        tg_command: "run-all init"
 
     - name: Terragrunt Plan
       uses: gruntwork-io/terragrunt-action@v3
@@ -58,7 +58,8 @@ jobs:
         TERRAGRUNT_DISABLE_COPY: true
       with:
         tg_dir: ${{ env.working_dir }}
-        tg_command: plan
+        tg_command: "run-all plan"
+
 
     - name: Terragrunt Apply
       uses: gruntwork-io/terragrunt-action@v3
@@ -66,14 +67,14 @@ jobs:
         TERRAGRUNT_DISABLE_COPY: true
       with:
         tg_dir: ${{ env.working_dir }}
-        tg_command: apply
+        tg_command: "run-all apply"
 
     - name: Read Values
       id: terragrunt_output
       run: |
-        cd terragrunt/live/website
-        printf "distribution_id=%s\n" $(terragrunt output distribution_id) >> "$GITHUB_OUTPUT"
-        printf "bucket_name=%s\n" $(terragrunt output bucket_name) >> "$GITHUB_OUTPUT"
+        cd terragrunt
+        printf "distribution_id=%s\n" $(terragrunt output --terragrunt-include-dir live distribution_id) >> "$GITHUB_OUTPUT"
+        printf "bucket_name=%s\n" $(terragrunt output --terragrunt-include-dir live bucket_name) >> "$GITHUB_OUTPUT"
 
     - name: Build Jekyll project
       run: |
