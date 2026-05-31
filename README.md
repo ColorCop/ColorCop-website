@@ -30,4 +30,19 @@ mise lint
 
 ## Deploy
 
-There is a [Github Action](https://github.com/ColorCop/colorcop-website/actions/workflows/deploy.yml) that runs when code merges to `master`.
+There is a [Github Action](https://github.com/ColorCop/colorcop-website/actions/workflows/deploy.yml) that runs when code merges to `main`. It provisions infrastructure with Terragrunt, builds the site, uploads it to S3, and refreshes CloudFront.
+
+---
+
+## How it works
+
+The deploy workflow automates the full publishing pipeline:
+
+- Triggered by pushes to `main` or `deploy-*`, or manually with a selected branch
+- Checks out the branch and configures temporary AWS credentials
+- Runs Terragrunt `init`, `plan`, and `apply` to update CloudFront, S3, and related infrastructure
+- Reads Terragrunt outputs (S3 bucket name and CloudFront distribution ID)
+- Builds the Jekyll site using Bundler and `mise build`
+- Validates the CloudFront distribution and S3 bucket
+- Syncs the built `_site/` directory to the S3 bucket
+- Invalidates CloudFront so new content is served immediately
