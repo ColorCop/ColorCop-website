@@ -1,17 +1,21 @@
-var banners = ['/images/1.gif','/images/2.gif','/images/3.gif','/images/4.gif','/images/5.gif','/images/6.gif'];
+document.addEventListener('DOMContentLoaded', () => {
+  const banners = [
+    '/images/1.gif','/images/2.gif','/images/3.gif',
+    '/images/4.gif','/images/5.gif','/images/6.gif'
+  ];
 
-var current = 0;
-function startDemo() {
+  const img = document.getElementById('screenshot-image');
+  let current = 0;
+
+  function nextAnimation() {
+    current = (current + 1) % banners.length;
+    img.src = banners[current];
+  }
+
+  function startDemo() {
     nextAnimation();
-    // call next animation every 4 seconds
-    setInterval('nextAnimation()', 4000);
-}
-function nextAnimation() {
-    current = (current+1) % 6;
-    $('#screenshot-image').attr('src', banners[current]);
-}
+    setInterval(nextAnimation, 4000);
+  }
 
-// dont start until the page loads
-$(function() {
-  setTimeout('startDemo()', 300);
+  setTimeout(startDemo, 300);
 });
