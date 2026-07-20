@@ -32,7 +32,7 @@ jobs:
     - name: Run linters
       run: mise lint
 
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@v7
       with:
         node-version-file: .nvmrc
 
